@@ -1,0 +1,42 @@
+# Environment Files
+.env
+.env.local
+.env.*.local
+.env.backup
+.env.production
+.env.staging
+
+# But include the example file for reference
+!.env.example
+
+# Node modules (if used)
+node_modules/
+npm-debug.log
+
+# Docker volumes and data (should not be committed)
+/data/
+/datadb/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Temporary files
+tmp/
+temp/
+.tmp/

@@ -1,5 +1,4 @@
 FROM debian:12
-MAINTAINER acvelez <acvelez@vidalinux.com>
 
 RUN \
   apt-get update && \
@@ -77,7 +76,8 @@ RUN \
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
-VOLUME [ "/var/lib/asterisk", "/etc/asterisk", "/usr/lib64/asterisk", "/var/www/html", "/var/log/asterisk" ]
+# 取消VOLUME 自行mount
+# VOLUME [ "/var/lib/asterisk", "/etc/asterisk", "/usr/lib64/asterisk", "/var/www/html", "/var/log/asterisk" ]
 
 EXPOSE 443 4569 4445 5060 5060/udp 5160/udp 18000-18100/udp
 

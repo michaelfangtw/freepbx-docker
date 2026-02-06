@@ -1,70 +1,122 @@
-version: '2'
+version: '3.8'
 
 services:
-  server:
-    container_name: pbx
+  freepbx_server:
+    container_name: freepbx_server
     image: freepbx-docker:20.17
-    ports:
-      - 443:443
-      - 4445:4445
-      - 4569:4569/udp
-      - 5060
-      - 5060:5060/udp
-      - 5160:5160/udp
-      - 18000-18100:18000-18100/udp
-    environment:
-      - TZ=America/Puerto_Rico
-      - DB_USER=asterisk
-      - DB_PASS=asteriskpass
-      - DBENGINE=mysql
-      - DBNAME=asterisk 
-      - DBHOST=192.168.0.2 
-      - DBPORT=3306 
-      - CDRDBNAME=asteriskcdrdb 
-      - DBUSER=asterisk 
-      - DBPASS=asterisk 
-      - USER=asterisk 
-      - GROUP=asterisk 
-      - WEBROOT=/var/www/html 
-      - ASTETCDIR=/etc/asterisk 
-      - ASTMODDIR=/usr/lib64/asterisk/modules 
-      - ASTVARLIBDIR=/var/lib/asterisk 
-      - ASTAGIDIR=/var/lib/asterisk/agi-bin 
-      - ASTSPOOLDIR=/var/spool/asterisk 
-      - ASTRUNDIR=/var/run/asterisk 
-      - AMPBIN=/var/lib/asterisk/bin 
-      - AMPSBIN=/usr/sbin 
-      - AMPCGIBIN=/var/www/cgi-bin 
-      - AMPPLAYBACK=/var/lib/asterisk/playback 
-    volumes:
-      - ./data/certs:/etc/apache2/certs
-      - ./data/log:/var/log/asterisk
     restart: always
+
+    ports:
+      - "80:80"                              # HTTP
+      - "443:443"                            # HTTPS
+      - "4445:4445"                          # Alternative HTTPS
+      - "4569:4569/udp"                      # IAX2
+      - "5060:5060"                          # SIP TCP
+      - "5060:5060/udp"                      # SIP UDP
+      - "5160:5160/udp"                      # IAX2 RTP
+      - "18000-18100:18000-18100/udp"        # RTP streams
+
+    environment:
+      # Timezone
+      - TZ=${TZ:-Asia/Taipei}
+
+      # Database Configuration (from .env)
+      - DB_USER=${DB_USER:-asterisk}
+      - DB_PASS=${DB_PASS}
+      - DBNAME=${DBNAME:-asterisk}
+      - DBHOST=${DBHOST:-freepbx_mariadb}
+      - DBPORT=${DBPORT:-3306}
+      - CDRDBNAME=${CDRDBNAME:-asteriskcdrdb}
+      - DBENGINE=${DBENGINE:-mysql}
+
+      # User and Group
+      - USER=${USER:-asterisk}
+      - GROUP=${GROUP:-asterisk}
+
+      # FreePBX/Asterisk Directories
+      - WEBROOT=${WEBROOT:-/var/www/html}
+      - ASTETCDIR=${ASTETCDIR:-/etc/asterisk}
+      - ASTMODDIR=${ASTMODDIR:-/usr/lib64/asterisk/modules}
+      - ASTVARLIBDIR=${ASTVARLIBDIR:-/var/lib/asterisk}
+      - ASTAGIDIR=${ASTAGIDIR:-/var/lib/asterisk/agi-bin}
+      - ASTSPOOLDIR=${ASTSPOOLDIR:-/var/spool/asterisk}
+      - ASTRUNDIR=${ASTRUNDIR:-/var/run/asterisk}
+      - AMPBIN=${AMPBIN:-/var/lib/asterisk/bin}
+      - AMPSBIN=${AMPSBIN:-/usr/sbin}
+      - AMPCGIBIN=${AMPCGIBIN:-/var/www/cgi-bin}
+      - AMPPLAYBACK=${AMPPLAYBACK:-/var/lib/asterisk/playback}
+
+    volumes:
+      # SSL Certificates (bind mount)
+      - ./data/certs:/etc/apache2/certs
+
+      # Asterisk Data (bind mount - CRITICAL)
+      - ./data/lib:/var/lib/asterisk
+
+      # Asterisk Configuration (bind mount - CRITICAL)
+      - ./data/etc:/etc/asterisk
+
+      
+      # Web Content
+      - ./data/www:/var/www/html
+
+      # Logs
+      - ./data/log:/var/log/asterisk
+
+      # Call Recordings
+      - ./data/monitor:/var/spool/asterisk/monitor
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
     networks:
       asterisk:
         ipv4_address: 192.168.0.3
 
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
   mariadb:
-    container_name: pbx-db
-    image: mariadb:10.11
+    container_name: freepbx_mariadb
+    image: mariadb:${MARIADB_VERSION:-10.11}
     restart: always
+
     volumes:
+      # MySQL Data (bind mount)
       - ./datadb:/var/lib/mysql
+
+      # Database Initialization Scripts
       - ./sql:/docker-entrypoint-initdb.d
+
     environment:
-      - TZ=America/Puerto_Rico
-      - MYSQL_ROOT_PASSWORD=asterisk
+      - TZ=${TZ:-Asia/Taipei}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DBNAME:-asterisk}
+      - MYSQL_USER=${DB_USER:-asterisk}
+      - MYSQL_PASSWORD=${DB_PASS}
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     networks:
       asterisk:
         ipv4_address: 192.168.0.2
 
 networks:
- asterisk:
+  asterisk:
     driver: bridge
     driver_opts:
       com.docker.network.enable_ipv6: "false"
     ipam:
       driver: default
       config:
-      - subnet: 192.168.0.0/24
-        gateway: 192.168.0.1
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.1
