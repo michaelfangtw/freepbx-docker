@@ -90,6 +90,17 @@ RUN \
   rm /usr/src/asterisk-20-current.tar.gz && \
   rm /usr/local/src/freepbx-17.0-latest-EDGE.tgz && \
   apt-get clean
+# install freepbx modules
+RUN \
+  cd /usr/local/src/freepbx && \
+  ./start_asterisk start && \
+  sleep 10 && \
+  fwconsole ma install miscapplications && \
+  fwconsole ma install miscdestinations && \
+  fwconsole ma install configedit && \
+  fwconsole ma install dynamicroutes && \
+  fwconsole reload && \
+  asterisk -rx "core reload" || true
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
