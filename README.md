@@ -10,6 +10,8 @@
 - [🔐 .env 配置指南](./ENV_GUIDE.md) | [.env Configuration Guide](./ENV_GUIDE.md)
 - [🏗️ Dockerfile 分析](./ARCHITECTURE_ANALYSIS.md) | [Dockerfile Analysis](./ARCHITECTURE_ANALYSIS.md)
 - [🔧 docker-compose 分析](./DOCKER_COMPOSE_ANALYSIS.md) | [docker-compose Analysis](./DOCKER_COMPOSE_ANALYSIS.md)
+- [🎙️ UniMRCP 設置](./UNIMRCP_SETUP.md) | [UniMRCP Setup](./UNIMRCP_SETUP.md) - 語音辨識和 TTS | Speech recognition & TTS
+- [📦 數據掛載 SOP](./MOUNT_SOP.md) | [Mount SOP](./MOUNT_SOP.md) - 完整遷移指南 | Complete migration guide
 
 ---
 
@@ -30,6 +32,7 @@ This repository contains Docker configurations for deploying a fully functional 
 - **FreePBX 17.0**：基於網頁的管理介面 | Web-based management interface
 - **MariaDB 10.11**：PBX 設定和 CDR 記錄的資料庫伺服器 | Database server for PBX configuration and CDR storage
 - **Apache 2.4**：支援 PHP 8.2 的網頁伺服器 | Web server with PHP 8.2 support
+- **UniMRCP 1.8.0** ✨ NEW：語音辨識和文字轉語音支持 | Speech recognition and text-to-speech support
 
 ---
 
@@ -128,6 +131,11 @@ This project supports two distinct workflows:
 - ✅ SSL/HTTPS 支援 | SSL/HTTPS support
 - ✅ ODBC 資料庫連線 | ODBC database connectivity
 - ✅ 完整 SIP 和 IAX2 協議支援 | Full SIP and IAX2 protocol support
+- ✨ **UniMRCP 集成** - 語音辨識和文字轉語音 | **UniMRCP Integration** - Speech recognition & TTS
+  - 自動語音應答 (IVR) | Automatic voice response (IVR)
+  - 語音辨識 (ASR) | Automatic speech recognition (ASR)
+  - 文字轉語音 (TTS) | Text-to-speech synthesis (TTS)
+  - MRCP v1/v2 協議支持 | MRCP v1/v2 protocol support
 
 ---
 
@@ -145,12 +153,22 @@ freepbx-docker/
 ├── QUICK_REFERENCE.md        # 快速指令參考 | Quick command reference
 ├── ARCHITECTURE_ANALYSIS.md  # 技術分析 | Technical analysis
 ├── data/                      # 執行時間資料（卷宗）| Runtime data (volumes)
-│   ├── certs/                # SSL 憑證 | SSL certificates
-│   ├── lib/                  # Asterisk 資料 | Asterisk data
-│   ├── etc/                  # Asterisk 設定 | Asterisk configuration
-│   ├── log/                  # Asterisk 日誌 | Asterisk logs
-│   └── monitor/              # 通話錄音 | Call recordings
-├── datadb/                    # MariaDB 資料檔案 | MariaDB data files
+│   ├── etc/
+│   │   ├── apache2/certs/    # SSL 憑證 | SSL certificates
+│   │   └── asterisk/         # Asterisk 設定 | Asterisk configuration
+│   ├── var/
+│   │   ├── lib/
+│   │   │   ├── asterisk/     # Asterisk 資料 | Asterisk data
+│   │   │   └── mysql/        # MariaDB 數據 | MariaDB data
+│   │   ├── log/asterisk/     # Asterisk 日誌 | Asterisk logs
+│   │   ├── spool/asterisk/   # 通話錄音 | Call recordings
+│   │   └── www/html/         # FreePBX 網頁 | FreePBX web
+│   └── usr/lib64/asterisk/   # Asterisk 模組 | Asterisk modules
+├── opt/unimrcp/               # UniMRCP 安裝 ✨ | UniMRCP installation
+│   ├── bin/                  # UniMRCP 二進位 | UniMRCP binaries
+│   ├── lib/                  # UniMRCP 庫 | UniMRCP libraries
+│   ├── conf/                 # UniMRCP 配置 | UniMRCP config
+│   └── plugin/asterisk/      # Asterisk 模組 | Asterisk module
 └── sql/                       # 資料庫初始化腳本 | Database initialization scripts
 ```
 
@@ -956,8 +974,12 @@ Container names in docker-compose.yml:
 - [🔐 .env 配置指南](./ENV_GUIDE.md) - 環境變數和敏感資訊管理 | Environment variables and secrets
 - [🏗️ Dockerfile 分析](./ARCHITECTURE_ANALYSIS.md) - Dockerfile 詳細分析 | Dockerfile detailed analysis
 - [🔧 docker-compose 分析](./DOCKER_COMPOSE_ANALYSIS.md) - docker-compose.yml 詳細分析和修正建議 | docker-compose.yml detailed analysis
+- [🎙️ UniMRCP 設置](./UNIMRCP_SETUP.md) - 語音辨識和文字轉語音 | Speech recognition and TTS
+- [📦 數據掛載 SOP](./MOUNT_SOP.md) - 完整遷移程序 | Complete migration procedure
+- [🎯 簡明版本](./BRIEF_README.md) - 快速參考 | Quick reference
 - [Asterisk 文檔](https://wiki.asterisk.org/) | [Asterisk Documentation](https://wiki.asterisk.org/)
 - [FreePBX 文檔](https://wiki.freepbx.org/) | [FreePBX Documentation](https://wiki.freepbx.org/)
+- [UniMRCP 文檔](http://www.unimrcp.org/) | [UniMRCP Documentation](http://www.unimrcp.org/)
 
 ---
 
