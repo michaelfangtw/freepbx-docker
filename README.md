@@ -12,6 +12,7 @@
 - [🔧 docker-compose 分析](./DOCKER_COMPOSE_ANALYSIS.md) | [docker-compose Analysis](./DOCKER_COMPOSE_ANALYSIS.md)
 - [🎙️ UniMRCP 設置](./UNIMRCP_SETUP.md) | [UniMRCP Setup](./UNIMRCP_SETUP.md) - 語音辨識和 TTS | Speech recognition & TTS
 - [📦 數據掛載 SOP](./MOUNT_SOP.md) | [Mount SOP](./MOUNT_SOP.md) - 完整遷移指南 | Complete migration guide
+- [🧩 FreePBX 模塊](./FREEPBX_MODULES.md) | [FreePBX Modules](./FREEPBX_MODULES.md) - 已安裝模塊說明 | Installed modules guide
 
 ---
 
