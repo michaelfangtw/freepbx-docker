@@ -61,11 +61,11 @@ docker build -t freepbx-docker:latest .
 # 進入容器
 docker-compose exec freepbx_server bash
 
-# 安裝單個模塊
-fwconsole ma install miscapplications
-fwconsole ma install miscdestinations
-fwconsole ma install configedit
-fwconsole ma install dynamicroutes
+# 下載並安裝模塊（推薦方式）
+fwconsole ma downloadinstall configedit
+fwconsole ma downloadinstall miscdests
+fwconsole ma downloadinstall miscapps
+fwconsole ma downloadinstall dynamicroutes
 
 # 重新載入
 fwconsole reload
@@ -74,6 +74,8 @@ asterisk -rx "core reload"
 # 退出容器
 exit
 ```
+
+**注意**: `downloadinstall` 會自動下載最新版本並安裝，比單純 `install` 更可靠。
 
 ### 方法 3: 使用 fwconsole 命令
 

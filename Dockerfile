@@ -94,13 +94,14 @@ RUN \
 RUN \
   cd /usr/local/src/freepbx && \
   ./start_asterisk start && \
-  sleep 10 && \
-  fwconsole ma install miscapplications && \
-  fwconsole ma install miscdestinations && \
-  fwconsole ma install configedit && \
-  fwconsole ma install dynamicroutes && \
+  sleep 15 && \
+  fwconsole ma downloadinstall configedit && \
+  fwconsole ma downloadinstall miscdests && \
+  fwconsole ma downloadinstall miscapps && \
+  fwconsole ma downloadinstall dynamicroutes && \
   fwconsole reload && \
-  asterisk -rx "core reload" || true
+  asterisk -rx "core reload" && \
+  asterisk -rx "module show like misc" || true
 ADD run-httpd.sh /run-httpd.sh
 RUN chmod -v +x /run-httpd.sh
 
