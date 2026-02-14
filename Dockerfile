@@ -5,7 +5,7 @@ RUN \
   apt-get -y upgrade && \
   apt -y install build-essential git curl wget libnewt-dev libssl-dev \
   libncurses5-dev subversion libsqlite3-dev libjansson-dev libxml2-dev uuid-dev \
-  default-libmysqlclient-dev htop sngrep lame ffmpeg mpg123 
+  default-libmysqlclient-dev htop sngrep lame ffmpeg mpg123 unzip 
 RUN \
   apt -y install git vim curl wget libnewt-dev libssl-dev libncurses5-dev \
   subversion libsqlite3-dev build-essential libjansson-dev libxml2-dev uuid-dev expect
@@ -13,7 +13,7 @@ RUN \
 RUN \
   apt -y install build-essential openssh-server apache2 cron \
   mariadb-client bison flex php8.2 php8.2-curl php8.2-cli php8.2-common php8.2-mysql php8.2-gd \
-  php8.2-mbstring php8.2-intl php8.2-xml php-pear curl sox libncurses5-dev libssl-dev mpg123 \
+  php8.2-mbstring php8.2-intl php8.2-xml php-pear curl sox libncurses5-dev libssl-dev mpg123 unzip \
   libxml2-dev libnewt-dev sqlite3 libsqlite3-dev pkg-config automake libtool autoconf git \
   unixodbc-dev uuid uuid-dev libasound2-dev libogg-dev libvorbis-dev libicu-dev libcurl4-openssl-dev \
   odbc-mariadb libical-dev libneon27-dev libsrtp2-dev libspandsp-dev sudo subversion libtool-bin \
