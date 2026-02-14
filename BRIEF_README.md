@@ -5,7 +5,7 @@ A containerized telephony system combining Asterisk, FreePBX, and MariaDB for Vo
 ## Component Versions
 
 | Component | Version |
-|-----------|---------|
+| --- | --- |
 | **Asterisk** | 20-current |
 | **FreePBX** | 17.0 (EDGE) |
 | **MariaDB** | Latest (Debian 12) |
@@ -15,35 +15,55 @@ A containerized telephony system combining Asterisk, FreePBX, and MariaDB for Vo
 ## Quick Usage
 
 ### Build & Run
+
 ```bash
 # Clone and setup
 git clone <repo-url>
 cd freepbx-docker
 cp .env.example .env          # Edit passwords!
-mkdir -p data/{certs,lib,etc,www,log}
-mkdir -p datadb
+mkdir -p data/{etc,var/lib,var/log,var/spool,var/www,usr/lib64}
 
 # Start services
 docker-compose up -d
 ```
 
 ### Access
+
 - **Web UI**: `https://localhost/admin`
 - **Asterisk CLI**: `docker-compose exec freepbx_server asterisk -r`
 - **Database**: `docker-compose exec mariadb mysql -u root -p asterisk`
 
 ## Key Ports
+
 - **443** - HTTPS (FreePBX web)
 - **5060/UDP** - SIP signaling
 - **5160/UDP** - IAX2
 - **18000-18100/UDP** - RTP media
 
 ## Data Persistence
-All data stored in `./data/` and `./datadb/`:
-- Configurations, extensions, voicemail, call records
+
+All data stored in `./data/` directory with OS hierarchy:
+
+```
+data/
+├── etc/
+│   ├── apache2/certs/          # SSL certificates
+│   └── asterisk/               # Asterisk config
+├── var/
+│   ├── lib/
+│   │   ├── asterisk/           # Asterisk data (CRITICAL)
+│   │   └── mysql/              # MariaDB data (CRITICAL)
+│   ├── log/asterisk/           # Asterisk logs
+│   ├── spool/asterisk/         # Voicemail & recordings
+│   └── www/html/               # FreePBX web UI
+└── usr/lib64/asterisk/         # Asterisk modules
+```
+
 - Survive container restarts and recreation
+- Easy to backup and migrate
 
 ## Documentation
+
 - [Full Setup Guide](./SETUP.md)
 - [Usage Guide](./USAGE_GUIDE.md)
 - [Quick Reference](./QUICK_REFERENCE.md)

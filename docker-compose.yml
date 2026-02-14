@@ -47,24 +47,35 @@ services:
       - AMPPLAYBACK=${AMPPLAYBACK:-/var/lib/asterisk/playback}
 
     volumes:
-      # SSL Certificates (bind mount)
-      - ./data/certs:/etc/apache2/certs
+      # ========================================
+      # Data Directory Structure
+      # Mirrors OS directory hierarchy for clarity
+      # 數據目錄結構對應 OS 路徑
+      # ========================================
 
-      # Asterisk Data (bind mount - CRITICAL)
-      - ./data/lib:/var/lib/asterisk
+      # SSL Certificates
+      - ./data/etc/apache2/certs:/etc/apache2/certs
 
-      # Asterisk Configuration (bind mount - CRITICAL)
-      - ./data/etc:/etc/asterisk
+      # Asterisk Configuration (CRITICAL)
+      - ./data/etc/asterisk:/etc/asterisk
 
-      
-      # Web Content
-      - ./data/www:/var/www/html
+      # Asterisk Data & Libraries (CRITICAL)
+      - ./data/var/lib/asterisk:/var/lib/asterisk
 
-      # Logs
-      - ./data/log:/var/log/asterisk
+      # Asterisk Modules
+      - ./data/usr/lib64/asterisk:/usr/lib64/asterisk
 
-      # Call Recordings
-      - ./data/monitor:/var/spool/asterisk/monitor
+      # Asterisk Spool (voicemail, call recordings)
+      - ./data/var/spool/asterisk:/var/spool/asterisk
+
+      # Asterisk Logs
+      - ./data/var/log/asterisk:/var/log/asterisk
+
+      # Web Content (FreePBX web interface)
+      - ./data/var/www/html:/var/www/html
+
+      # Apache Configuration
+      - ./data/etc/apache2/apache2.conf:/etc/apache2/apache2.conf
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
@@ -87,8 +98,13 @@ services:
     restart: always
 
     volumes:
-      # MySQL Data (bind mount)
-      - ./datadb:/var/lib/mysql
+      # ========================================
+      # MariaDB Data Directory
+      # Mirrors OS directory hierarchy
+      # ========================================
+
+      # MySQL/MariaDB Data (bind mount)
+      - ./data/var/lib/mysql:/var/lib/mysql
 
       # Database Initialization Scripts
       - ./sql:/docker-entrypoint-initdb.d
