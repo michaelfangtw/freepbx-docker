@@ -66,6 +66,23 @@ COPY ./default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
 RUN \
     a2ensite default-ssl && \
     a2enmod ssl
+# install unimrcp
+RUN \
+  wget -O /usr/src/unimrcp-1.8.0.tar.gz http://www.unimrcp.org/project/component-view/unimrcp-downloads/unimrcp-1.8.0/unimrcp-1.8.0.tar.gz && \
+  tar xvf /usr/src/unimrcp-1.8.0.tar.gz -C /usr/src/ && \
+  cd /usr/src/unimrcp-1.8.0/ && \
+  ./configure --prefix=/opt/unimrcp && \
+  make && \
+  make install && \
+  ldconfig && \
+  rm /usr/src/unimrcp-1.8.0.tar.gz
+# install unimrcp asterisk plugin
+RUN \
+  cd /usr/src/unimrcp-1.8.0/plugins/asterisk && \
+  ./configure --with-asterisk=/usr/src/asterisk-20* --with-unimrcp=/opt/unimrcp && \
+  make && \
+  make install && \
+  ldconfig
 # install freepbx
 RUN \
   wget -O /usr/local/src/freepbx-17.0-latest-EDGE.tgz http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest-EDGE.tgz && \
